@@ -104,7 +104,7 @@ Read this before hosting openGym for anyone other than yourself.
   verified server-side by `@simplewebauthn/server` against `expectedOrigin: ORIGIN` and
   `expectedRPID: RP_ID`, and the authenticator's signature counter is stored and updated on every
   login (the `POST /api/register/verify` and `POST /api/login/verify` handlers in `api/server.js`).
-- **Passwords only if the instance asks for them.** With `PASSWORD_LOGIN=1` a profile may also
+- **Passwords unless the instance turns them off.** Unless `PASSWORD_LOGIN=0`, a profile may also
   set a password (nobody has one until they do). It is hashed with scrypt (N=2^15, r=8, p=1,
   16-byte random salt, parameters stored with the hash) and compared in constant time; a name
   with no password is checked against a dummy hash, so answer and timing are the same whether or

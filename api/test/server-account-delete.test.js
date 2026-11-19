@@ -239,7 +239,7 @@ test('needs proof that the owner is here: missing or wrong, nothing is removed',
 });
 
 test('with password sign-in off, a password proves nothing', async t => {
-  const h = await startServer(t, { env: { PASSWORD_LOGIN: '' } });
+  const h = await startServer(t, { env: { PASSWORD_LOGIN: '0' } });
   const res = await h.del(USER, { name: 'Mallory', current: GOOD });
   assert.equal(res.status, 403);
   assert.equal(res.body.code, 'passkey-required');

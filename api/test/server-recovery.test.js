@@ -29,7 +29,7 @@ async function startServer(t, { env = {}, users = [], creds = [] } = {}) {
   fs.writeFileSync(path.join(dataDir, 'secret'), SECRET, { mode: 0o600 });
   fs.writeFileSync(path.join(dataDir, 'db.json'), JSON.stringify({ users, creds, subs: [], invites: [] }));
   // Password sign-in OFF: recovery has to work without it.
-  const childEnv = { ...process.env, PORT: '0', DATA_DIR: dataDir, ORIGIN, RP_ID: 'localhost', PASSWORD_LOGIN: '', TRUST_PROXY: '1', INVITE_ONLY: '', ADMIN_UIDS: '', AUDIT_LOG: '1', ...env };
+  const childEnv = { ...process.env, PORT: '0', DATA_DIR: dataDir, ORIGIN, RP_ID: 'localhost', PASSWORD_LOGIN: '0', TRUST_PROXY: '1', INVITE_ONLY: '', ADMIN_UIDS: '', AUDIT_LOG: '1', ...env };
   const child = spawn(process.execPath, ['server.js'], { cwd: API, stdio: ['ignore', 'pipe', 'pipe'], env: childEnv });
   const h = { api: '', log: '', dataDir, env: childEnv, child };
   child.stdout.on('data', d => h.log += d);

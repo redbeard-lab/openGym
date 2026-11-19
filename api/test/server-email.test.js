@@ -121,7 +121,7 @@ test('normalizeEmail folds and checks the way sign-in compares; maskEmail keeps 
 
 test('with PASSWORD_LOGIN off the e-mail routes are 404s, sign-in by e-mail too, and admins see no address', async t => {
   const h = await startServer(t, {
-    env: { PASSWORD_LOGIN: '', ADMIN_UIDS: 'adm' },
+    env: { PASSWORD_LOGIN: '0', ADMIN_UIDS: 'adm' },
     users: [user('adm', 'Root'), withPassword('u1', 'Ana', { email: 'ana@example.com' })]
   });
   const cookie = `gymsid=${mintSession('u1')}`;

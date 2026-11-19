@@ -85,7 +85,8 @@ its troubleshooting section covers the rarer cases.
 
 ### Can I use a password instead of a passkey?
 
-Yes, if the instance allows it: set `PASSWORD_LOGIN=1`. It's off by default. See
+Yes. Password sign-in is on by default and offered first; passkeys work too. An instance can
+turn passwords off with `PASSWORD_LOGIN=0`. See
 [password sign-in](SELF_HOSTING.md#password-sign-in-optional).
 
 ### Can several people use one instance?

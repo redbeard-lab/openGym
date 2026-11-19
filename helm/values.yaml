@@ -114,7 +114,7 @@ api:
     INVITE_ONLY: ""          # "1" = signup needs an invite code
     ALLOW_GUEST: ""          # "0" = no "Continue without account"
     DEFAULT_LANG: ""         # en, de, pt-BR, th, ...
-    PASSWORD_LOGIN: ""       # "1" = password sign-in next to passkeys
+    PASSWORD_LOGIN: ""       # "0" = passkeys only (default: password sign-in, offered first)
     # Sign in with an identity provider (docs/SELF_HOSTING.md); OIDC_CLIENT_SECRET is in secretEnv.
     OIDC_ISSUER: ""          # e.g. https://auth.example.com
     OIDC_CLIENT_ID: ""

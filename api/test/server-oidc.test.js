@@ -30,7 +30,7 @@ async function setup(t, { env = {}, users = [], creds = [], mock: mockOpts = {} 
     cwd: API, stdio: ['ignore', 'pipe', 'pipe'],
     env: {
       ...process.env, PORT: '0', DATA_DIR: dataDir, ORIGIN, RP_ID: 'localhost', AUDIT_LOG: '1', TRUST_PROXY: '1',
-      INVITE_ONLY: '', ADMIN_UIDS: '', FIRST_USER_ADMIN: '', PASSWORD_LOGIN: '',
+      INVITE_ONLY: '', ADMIN_UIDS: '', FIRST_USER_ADMIN: '', PASSWORD_LOGIN: '0',
       OIDC_ISSUER: mock.issuer, OIDC_CLIENT_ID: mock.clientId, OIDC_CLIENT_SECRET: mock.clientSecret,
       OIDC_LABEL: 'VoidAuth', ...env
     }

@@ -103,7 +103,7 @@ const withPassword = (id, name, extra = {}) => user(id, name, { pw: { h: pwHash,
 const login = (h, name, password, ip) => h.req('POST', '/api/login/password', { body: { name, password }, ip });
 
 test('with PASSWORD_LOGIN off every password route is a 404 and /api/config says nothing', async t => {
-  const h = await startServer(t, { env: { PASSWORD_LOGIN: '' }, users: [user('u1', 'Ana')] });
+  const h = await startServer(t, { env: { PASSWORD_LOGIN: '0' }, users: [user('u1', 'Ana')] });
   const cookie = `gymsid=${mintSession('u1')}`;
   for (const [m, p] of [
     ['POST', '/api/login/password'], ['POST', '/api/register/password'], ['POST', '/api/login/password-reset'],
@@ -268,7 +268,7 @@ test('a flood from a shared address leaves passkey sign-in, registration and pai
   assert.equal(h.audit().some(e => e.ev === 'auth.throttled' && e.msg !== 'password'), false);
 
   // With PASSWORD_LOGIN off nothing at all is counted.
-  const off = await startServer(t, { env: { TRUST_PROXY: '', PASSWORD_LOGIN: '' } });
+  const off = await startServer(t, { env: { TRUST_PROXY: '', PASSWORD_LOGIN: '0' } });
   for (let i = 0; i < 100; i++) assert.equal((await off.req('POST', '/api/login/options', { body: {} })).status, 200);
 });
 

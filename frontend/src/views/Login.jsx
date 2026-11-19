@@ -21,9 +21,10 @@ function RegisterSheet({ close }) {
   const [code, setCode] = useState('')
   const inviteOnly = !!config?.invite_only
   // A password is offered only where the instance allows it (#118), and is the only choice in a
-  // browser that cannot make a passkey. Where both work, the passkey stays the first one.
+  // browser that cannot make a passkey. Where both work, the password is the first one and a
+  // passkey is one tap away.
   const pwOn = passwordOn(config)
-  const [how, setHow] = useState(webauthnOK() ? 'passkey' : 'password')
+  const [how, setHow] = useState(pwOn || !webauthnOK() ? 'password' : 'passkey')
   const ref = useRef(null)
   useEffect(() => { setTimeout(() => ref.current?.focus(), 250) }, [])
   // Boot already fetched this; retry here only if that attempt failed, so the invite field still
@@ -41,7 +42,7 @@ function RegisterSheet({ close }) {
     } catch (e) { if (e.name !== 'NotAllowedError' && e.name !== 'AbortError') useUI.getState().toast(passkeyError(e, t('Registration failed'))) }
   }
   const choose = pwOn && webauthnOK() && <>
-    <Segmented options={[{ value: 'passkey', label: t('Passkey'), icon: 'fingerprint' }, { value: 'password', label: t('Password'), icon: 'key' }]}
+    <Segmented options={[{ value: 'password', label: t('Password'), icon: 'key' }, { value: 'passkey', label: t('Passkey'), icon: 'fingerprint' }]}
       value={how} onChange={setHow} />
     <div style={{ height: 12 }} />
   </>
@@ -140,9 +141,10 @@ export default function Login() {
       {ssoNote}
       {ssoButton}
       {webauthnOK() ? <>
-        <Button variant={sso ? undefined : 'primary'} icon="fingerprint" onClick={signIn}>{t('Sign in with passkey')}</Button>
+        {/* With password sign-in on, the password is the main way in and the passkey comes second. */}
+        {pwOn && <><Button variant={sso ? undefined : 'primary'} icon="key" onClick={() => openPasswordSignIn()}>{t('Sign in with password')}</Button><div style={{ height: 10 }} /></>}
+        <Button variant={sso || pwOn ? undefined : 'primary'} icon="fingerprint" onClick={signIn}>{t('Sign in with passkey')}</Button>
         <div style={{ height: 10 }} />
-        {pwOn && <><Button icon="key" onClick={() => openPasswordSignIn()}>{t('Sign in with password')}</Button><div style={{ height: 10 }} /></>}
         <Button icon="plusCircle" onClick={register}>{t('Create new profile')}</Button>
         {/* Already signed in on another device: a code from there gives this one a passkey of
             its own (#95), instead of a new, empty profile. */}

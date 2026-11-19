@@ -96,10 +96,11 @@ function claimFirstAdmin(req, user) {
 // out of is still the wrong front door (#42). Default ON, so existing instances are unchanged;
 // the polarity is inverted from INVITE_ONLY because the safe default here is the permissive one.
 const ALLOW_GUEST = !/^(0|false|no|off)$/i.test(process.env.ALLOW_GUEST || '');
-// Name-and-password sign-in next to passkeys (#118). Off by default: it adds a second way into
-// every account that opts in, so an instance has to ask for it. While it is off every password
-// route answers 404 and the app shows none of it; hashes already stored stay where they are.
-const PASSWORD_LOGIN = /^(1|true|yes|on)$/i.test(process.env.PASSWORD_LOGIN || '');
+// Name-and-password sign-in next to passkeys (#118). On by default, and the app offers the
+// password first; passkeys keep working for anyone who adds one. PASSWORD_LOGIN=0 turns it off:
+// every password route then answers 404 and the app shows none of it; hashes already stored stay
+// where they are. Same polarity as ALLOW_GUEST: unset or empty means on.
+const PASSWORD_LOGIN = !/^(0|false|no|off)$/i.test(process.env.PASSWORD_LOGIN || '');
 // Trainers, gym leads and studios (docs/TRAINERS.md). Off by default: with it off every
 // /api/sharing, /api/trainer and /api/admin/gyms route answers 404 and the app shows nothing.
 const TRAINERS = /^(1|true|yes|on)$/i.test(process.env.TRAINERS || '');

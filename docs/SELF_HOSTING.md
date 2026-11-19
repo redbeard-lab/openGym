@@ -61,7 +61,7 @@ phone) cannot use `http://<your-LAN-ip>:8080`** — that's neither localhost nor
 passkey prompt won't appear. To use openGym from your phone you need a real HTTPS hostname.
 
 (You can still open it over LAN in **guest mode**, which stores data only in that browser — or
-turn on **password sign-in**, see [§4](#password-sign-in-optional).)
+use **password sign-in**, on by default, see [§4](#password-sign-in-optional).)
 
 The standalone mobile app (`docs/MOBILE.md`) sidesteps this entirely for its "connect to my
 server" mode: instead of a passkey ceremony (impossible from inside its WebView, which never
@@ -343,19 +343,22 @@ that is not the default here.
 
 ### Password sign-in (optional)
 
-Passkeys are the default and stay the recommended way in. Some people cannot use them: a browser
-on a plain `http://` LAN address (passkeys need HTTPS or `localhost`), a Firefox setup that only
-offers a hardware key, a passkey on a phone that will not move to the desktop. For them there is
-an optional name-and-password sign-in, off unless you ask for it:
+Name-and-password sign-in is **on by default**, and the sign-in screen offers it first. Passkeys
+are still supported next to it: anyone can add one in Settings → Account and sign in with it
+instead. Passwords also cover the people who cannot use passkeys at all: a browser on a plain
+`http://` LAN address (passkeys need HTTPS or `localhost`), a Firefox setup that only offers a
+hardware key, a passkey on a phone that will not move to the desktop. To offer passkeys only,
+turn it off:
 
 ```bash
-PASSWORD_LOGIN=1
+PASSWORD_LOGIN=0
 ```
 
-What changes when it is on:
+What it does while it is on:
 
-- The sign-in screen offers **Sign in with password**, and **Create new profile** can use a
-  password instead of a passkey — in browsers without passkey support too. With `INVITE_ONLY=1`
+- The sign-in screen offers **Sign in with password** as its main button, with **Sign in with
+  passkey** below it, and **Create new profile** starts on a password (a passkey is one tap
+  away) — in browsers without passkey support too. With `INVITE_ONLY=1`
   it asks for the invite code exactly like passkey signup does.
 - Settings → Account gets a **Password** row. Nobody has a password until they set one there.
   Setting a first password asks for the profile's passkey; changing it asks for the current
@@ -770,8 +773,8 @@ at ...", and `docker compose logs api` prints a `refused cross-origin` line with
 and `RP_ID=` to set. After changing `.env`, recreate the stack (Container Station's **Recreate**,
 Container Manager's **Build**, or `docker compose up -d`); a plain restart keeps the old values.
 Over plain http on a LAN address there are no passkeys (see [§2](#2-understand-the-passkey-requirement-important)),
-so for a first look either add `PASSWORD_LOGIN=1` ([password sign-in](#password-sign-in-optional))
-or keep going to step 4.
+so for a first look sign in with a password ([password sign-in](#password-sign-in-optional), on
+by default) or keep going to step 4.
 
 **4. HTTPS through the NAS's reverse proxy.** For passkeys, the iPhone web app and
 notifications, give openGym a hostname with a certificate and point the proxy at the `web`
@@ -1300,7 +1303,7 @@ without `PASSWORD_LOGIN`:
   your other device**) and enters it. The device they use gets a new passkey for their profile
   and is signed in. In the phone app: redeem the code in a browser, then pair the app again.
   Once back in, they can remove the lost device's passkey under **Settings → Account → Passkeys**
-  and, where `PASSWORD_LOGIN=1`, set a password there too.
+  and, unless `PASSWORD_LOGIN=0`, set a password there too.
 
 A recovery code is 12 characters (60 bits), works once, for 24 hours, and is stored only as a
 hash, like a password reset code. Making one signs the profile out everywhere at once (a lost

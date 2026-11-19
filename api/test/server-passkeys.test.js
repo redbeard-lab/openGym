@@ -199,7 +199,7 @@ test('the current password proves an addition while the instance offers password
 // neither answered differently nor counted), and the list does not offer it; a passkey still does.
 test('with PASSWORD_LOGIN off only a passkey proves anything; a stored password is ignored', async t => {
   const key = softPasskey(), other = softPasskey();
-  const h = await startServer(t, { env: { PASSWORD_LOGIN: '' }, users: [withPassword('u1', 'Ana'), withPassword('u2', 'Bea')], creds: [key.row('u1'), other.row('u1')] });
+  const h = await startServer(t, { env: { PASSWORD_LOGIN: '0' }, users: [withPassword('u1', 'Ana'), withPassword('u2', 'Bea')], creds: [key.row('u1'), other.row('u1')] });
   const ip = '198.51.100.24', cookie = mintSession('u1');
   assert.equal((await h.req('GET', '/api/account/passkeys', { cookie, ip })).body.password, false);
   for (let i = 0; i < 7; i++) {
@@ -389,13 +389,14 @@ test('removing the password and the last passkey at the same time leaves one of 
 });
 
 test('a password is a way in only while the instance offers password sign-in', async t => {
-  for (const [flag, status] of [['1', 200], ['', 409]]) {
+  // Unset (empty) is on: password sign-in is the default; '0' turns it off.
+  for (const [flag, on, ip] of [['1', true, '198.51.100.36'], ['', true, '198.51.100.38'], ['0', false, '198.51.100.37']]) {
+    const status = on ? 200 : 409;
     const key = softPasskey();
     const h = await startServer(t, { env: { PASSWORD_LOGIN: flag }, users: [withPassword('u1', 'Ana')], creds: [key.row('u1')] });
-    const ip = flag ? '198.51.100.36' : '198.51.100.37';
     const list = await h.req('GET', '/api/account/passkeys', { cookie: mintSession('u1'), ip });
-    assert.equal(list.body.lastWayIn, !flag);
-    assert.equal(list.body.password, !!flag);
+    assert.equal(list.body.lastWayIn, !on);
+    assert.equal(list.body.password, on);
     const r = await h.req('DELETE', '/api/account/passkeys?id=' + key.id, { body: await h.stepUp(key, ip), cookie: mintSession('u1'), ip });
     assert.equal(r.status, status, `PASSWORD_LOGIN=${flag}`);
   }

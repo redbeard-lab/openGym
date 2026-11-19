@@ -62,10 +62,12 @@ describe('Login with password sign-in', () => {
     expect(buttons(noPasskeys)).not.toContain('Sign in with password')
   })
 
-  it('next to passkeys it is a second button, and the footer no longer says "no passwords"', () => {
+  it('next to passkeys it is the first button, and the footer no longer says "no passwords"', () => {
     mocks.config = { password_login: true, allow_guest: true }
     const page = mount(<Login />)
-    expect(buttons(page).slice(0, 3)).toEqual(['Sign in with passkey', 'Sign in with password', 'Create new profile'])
+    expect(buttons(page).slice(0, 3)).toEqual(['Sign in with password', 'Sign in with passkey', 'Create new profile'])
+    expect(button(page, 'Sign in with password').className).toContain('primary')
+    expect(button(page, 'Sign in with passkey').className).not.toContain('primary')
     expect(page.textContent).toContain('Passkeys use your fingerprint. A password works too, where passkeys do not.')
     act(() => button(page, 'Sign in with password').click())
     const sheet = mount(mocks.sheets[0](() => {}))
@@ -88,15 +90,15 @@ describe('Login with password sign-in', () => {
     expect(buttons(sheet)).toContain('Create profile')
   })
 
-  it('where both work, creating a profile starts on the passkey and switches to a password', () => {
+  it('where both work, creating a profile starts on the password and switches to a passkey', () => {
     mocks.config = { password_login: true, invite_only: true }
     const page = mount(<Login />)
     act(() => button(page, 'Create new profile').click())
     const sheet = mount(mocks.sheets[0](() => {}))
-    expect(buttons(sheet)).toContain('Create passkey')
-    act(() => button(sheet, 'Password').click())
     expect(buttons(sheet)).toContain('Create profile')
     expect(sheet.querySelector('input[placeholder="Invite code"]')).toBeTruthy()
     expect(sheet.querySelector('input[autocomplete="new-password"]')).toBeTruthy()
+    act(() => button(sheet, 'Passkey').click())
+    expect(buttons(sheet)).toContain('Create passkey')
   })
 })
