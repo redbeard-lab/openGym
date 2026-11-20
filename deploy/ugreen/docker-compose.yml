@@ -1,0 +1,45 @@
+# openGym on a UGREEN NAS (UGOS Pro, e.g. DXP4800 Pro), from the redbeard-lab fork's images.
+#
+# Before you paste this into Docker -> Project -> Create:
+#   1. Create the folder /volume1/docker/opengym/data in File Manager
+#      (or change the two paths below to wherever you keep Docker data).
+#   2. Replace 192.168.1.50 below with your NAS's LAN address (two places).
+#   3. If port 3030 is taken on the NAS, pick another and change it in ports: and ORIGIN.
+#
+# Then open http://<NAS address>:3030, choose "Create new profile" and set a password.
+# The first profile becomes the admin (FIRST_USER_ADMIN=1).
+name: opengym
+
+services:
+  api:
+    image: ghcr.io/redbeard-lab/opengym-api:edge
+    restart: unless-stopped
+    environment:
+      # The exact address you type in the browser. Every save is refused if this is wrong.
+      - ORIGIN=http://192.168.1.50:3030
+      - RP_ID=192.168.1.50
+      - RP_NAME=openGym
+      - PORT=3000
+      - DATA_DIR=/data
+      # The API is reachable only through the web container, which overwrites the
+      # forwarded-for headers, so the sign-in throttle may trust them.
+      - TRUST_PROXY=1
+      # The first profile created on this fresh instance becomes the admin.
+      - FIRST_USER_ADMIN=1
+      # Password sign-in is on by default in this fork; passkeys need HTTPS (see below).
+      # - PASSWORD_LOGIN=0
+      # After your own profile exists, uncomment to require invite codes for new ones:
+      # - INVITE_ONLY=1
+    volumes:
+      # Users, passwords, passkeys, workouts and the session secret. Back this folder up.
+      - /volume1/docker/opengym/data:/data
+
+  web:
+    image: ghcr.io/redbeard-lab/opengym-web:edge
+    restart: unless-stopped
+    depends_on: [api]
+    ports:
+      - "3030:80"
+    environment:
+      - BACKEND=api
+      - PORT=3000
